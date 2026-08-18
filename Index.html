@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Moulinette devis intervention — DIGITAL BUSINESS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#EAEEF2;--card:#FFFFFF;--ink:#16202B;--muted:#5C6B7A;--line:#D4DBE2;--line-soft:#E7ECF0;
+    --accent:#0E7C66;--accent-dk:#0A5C4C;--signal:#B4531F;--signal-bg:#FBEEE4;--auto-bg:#EAF4F1;
+    --shadow:0 1px 2px rgba(22,32,43,.06), 0 8px 24px rgba(22,32,43,.06);
+    --mono:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+    --disp:'Space Grotesk',system-ui,sans-serif;
+    --body:'Inter',system-ui,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1180px;margin:0 auto;padding:28px 20px 80px}
+  header.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:16px;padding-bottom:20px;margin-bottom:24px;border-bottom:2px solid var(--ink)}
+  .brand{display:flex;flex-direction:column;gap:2px}
+  .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--accent);font-weight:600}
+  h1{font-family:var(--disp);font-weight:700;font-size:30px;line-height:1.05;margin:2px 0 0;letter-spacing:-.01em}
+  .acct{font-family:var(--mono);font-size:12px;color:var(--muted);text-align:right;line-height:1.7}
+  .acct b{color:var(--ink);font-weight:600}
+  .grid{display:grid;grid-template-columns:1fr 400px;gap:24px;align-items:start}
+  @media(max-width:900px){.grid{grid-template-columns:1fr}}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow)}
+  .panel{padding:22px}
+  .panel + .panel{border-top:1px solid var(--line-soft)}
+  .sec-head{display:flex;align-items:center;gap:10px;margin:0 0 16px}
+  .sec-num{font-family:var(--mono);font-size:11px;font-weight:700;color:#fff;background:var(--ink);width:22px;height:22px;border-radius:5px;display:grid;place-items:center;flex:none}
+  .sec-head h2{font-family:var(--disp);font-size:15px;font-weight:600;margin:0;letter-spacing:.01em}
+  label.fl{display:block;font-size:12px;font-weight:600;color:var(--muted);margin:0 0 6px;letter-spacing:.01em}
+  .field{margin-bottom:16px}
+  .row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+  .row4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px}
+  @media(max-width:600px){.row,.row3,.row4{grid-template-columns:1fr}}
+  select,input[type=number],input[type=text]{width:100%;font-family:var(--body);font-size:15px;color:var(--ink);background:#fff;border:1px solid var(--line);border-radius:8px;padding:10px 12px;transition:border-color .15s,box-shadow .15s}
+  input[type=number]{font-family:var(--mono);font-weight:500}
+  select:focus,input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(14,124,102,.14)}
+  .suffix{position:relative}
+  .suffix .u{position:absolute;right:12px;top:50%;transform:translateY(-50%);font-family:var(--mono);font-size:12px;color:var(--muted);pointer-events:none}
+  .suffix input{padding-right:38px}
+  .hint{font-size:12px;color:var(--muted);margin:6px 0 0;line-height:1.45}
+  .hint a{color:var(--accent);text-decoration:none}
+  .hint a:hover{text-decoration:underline}
+
+  /* Address autocomplete */
+  .addr-wrap{position:relative}
+  .addr-wrap input{padding-right:36px}
+  .addr-clear{position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:0;font-size:18px;color:var(--muted);cursor:pointer;padding:2px 6px;line-height:1;display:none}
+  .addr-clear:hover{color:var(--ink)}
+  .addr-drop{position:absolute;top:100%;left:0;right:0;background:#fff;border:1px solid var(--line);border-radius:8px;box-shadow:var(--shadow);max-height:220px;overflow-y:auto;z-index:90;display:none}
+  .addr-drop.open{display:block}
+  .addr-drop .opt{padding:9px 14px;font-size:14px;cursor:pointer;transition:background .1s;line-height:1.35}
+  .addr-drop .opt:hover,.addr-drop .opt.hl{background:var(--line-soft)}
+  .addr-drop .opt small{display:block;color:var(--muted);font-size:11.5px;margin-top:1px}
+  .addr-drop .empty-msg{padding:14px;font-size:13px;color:var(--muted);text-align:center}
+
+  /* Route result badge */
+  .route-badge{display:inline-flex;align-items:center;gap:8px;padding:8px 14px;border-radius:8px;background:var(--auto-bg);font-family:var(--mono);font-size:12.5px;font-weight:600;color:var(--accent-dk);margin-top:6px;line-height:1.4;flex-wrap:wrap}
+  .route-badge .dot{width:8px;height:8px;border-radius:50%;background:var(--accent);flex:none}
+  .route-badge .sep{color:var(--accent);opacity:.4}
+  .route-err{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:7px;background:var(--signal-bg);font-family:var(--mono);font-size:12px;color:var(--signal);margin-top:6px}
+
+  /* Spinner */
+  .spinner{display:inline-block;width:14px;height:14px;border:2px solid var(--line);border-top-color:var(--accent);border-radius:50%;animation:spin .6s linear infinite;vertical-align:middle;margin-left:6px}
+  @keyframes spin{to{transform:rotate(360deg)}}
+
+
+
+  /* Ledger */
+  .ledger{position:sticky;top:20px}
+  .ledger .panel{padding:22px}
+  .ledger-head{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:4px}
+  .ledger-head h2{font-family:var(--disp);font-size:15px;font-weight:600;margin:0}
+  .ledger-head .cfg{font-family:var(--mono);font-size:11px;color:var(--muted)}
+  .lines{margin:14px 0 0;border-top:1px solid var(--line)}
+  .line{display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px solid var(--line-soft);font-size:13.5px}
+  .line .lbl{color:var(--ink);flex:1}
+  .line .lbl small{display:block;color:var(--muted);font-size:11.5px;font-family:var(--mono);margin-top:1px}
+  .line .amt{font-family:var(--mono);font-weight:600;font-size:14px;white-space:nowrap}
+  .line.dim .lbl,.line.dim .amt{color:var(--muted)}
+  .line.sig .amt{color:var(--signal)}
+  .line.zero .amt{color:var(--muted);font-weight:400}
+  .subtot{display:flex;justify-content:space-between;align-items:baseline;padding:12px 0 4px;font-family:var(--disp);font-weight:600;font-size:14px;color:var(--muted)}
+  .subtot .amt{font-family:var(--mono)}
+  .grand{margin-top:12px;padding:18px;border-radius:10px;background:var(--ink);color:#fff}
+  .grand .row-grand{display:flex;justify-content:space-between;align-items:flex-end;gap:12px}
+  .grand .col-grand{flex:1}
+  .grand .k{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#8FA3B3}
+  .grand .v{font-family:var(--mono);font-weight:700;font-size:28px;letter-spacing:-.02em;line-height:1.1;margin-top:2px;transition:opacity .12s}
+  .grand .v .cur{font-size:18px;font-weight:500;color:#8FA3B3;margin-left:4px}
+  .grand .v.sm{font-size:20px}
+  .grand .marge-row{margin-top:14px;padding-top:14px;border-top:1px solid #2A3947}
+
+  .trace{margin-top:14px;padding:12px 14px;border-radius:9px;background:var(--line-soft);font-family:var(--mono);font-size:11.5px;line-height:1.7;color:var(--muted)}
+  .trace b{color:var(--ink);font-weight:600}
+  .trace .warn{color:var(--signal);font-weight:600}
+  .empty{padding:30px 10px;text-align:center;color:var(--muted);font-size:13.5px;line-height:1.5}
+  footer.note{margin-top:20px;font-size:11.5px;color:var(--muted);line-height:1.6;border-top:1px solid var(--line);padding-top:16px}
+  footer.note b{color:var(--ink)}
+  footer.note code{font-family:var(--mono);background:var(--line-soft);padding:1px 5px;border-radius:4px;font-size:11px}
+
+  /* Mappy link button */
+  .mappy-link{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:7px;background:var(--ink);color:#fff;font-family:var(--body);font-size:12.5px;font-weight:600;text-decoration:none;transition:opacity .15s;margin-top:6px}
+  .mappy-link:hover{opacity:.85}
+  .mappy-link svg{width:14px;height:14px;fill:currentColor;flex:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <span class="eyebrow">Barème URSSAF 2025 / 2026 · EUR HT</span>
+      <h1>Moulinette devis intervention</h1>
+    </div>
+    <div class="acct">Client&nbsp;: <b>DIGITAL BUSINESS</b><br>Compte&nbsp;: <b>10486502</b></div>
+  </header>
+  <div class="grid">
+    <!-- ===================== INPUTS ===================== -->
+    <div class="card" id="form">
+      <div class="panel">
+        <div class="sec-head"><span class="sec-num">1</span><h2>Trajet</h2></div>
+
+        <div class="row">
+          <div class="field">
+            <label class="fl">Lieu de départ</label>
+            <div class="addr-wrap">
+              <input type="text" id="addrOrig" placeholder="ex. Noisy-le-Grand" autocomplete="off">
+              <button class="addr-clear" id="clearOrig">&times;</button>
+              <div class="addr-drop" id="dropOrig"></div>
+            </div>
+          </div>
+          <div class="field">
+            <label class="fl">Lieu d'intervention</label>
+            <div class="addr-wrap">
+              <input type="text" id="addrDest" placeholder="ex. 5 rue Dewoitine, Vélizy" autocomplete="off">
+              <button class="addr-clear" id="clearDest">&times;</button>
+              <div class="addr-drop" id="dropDest"></div>
+            </div>
+          </div>
+        </div>
+
+        <div id="routeResult"></div>
+
+        <div class="row" style="margin-top:14px">
+          <div class="field">
+            <label class="fl">Distance aller</label>
+            <div class="suffix"><input type="number" id="distance" min="0" step="0.1" value="0"><span class="u">km</span></div>
+            <p class="hint">Calculée automatiquement ou saisissable manuellement.</p>
+          </div>
+          <div class="field">
+            <label class="fl">Péage aller</label>
+            <div class="suffix"><input type="number" id="peage" min="0" step="0.1" value="0"><span class="u">€</span></div>
+            <p class="hint">À renseigner via <a href="#" id="mappyLink" target="_blank" rel="noopener">simulation Mappy ↗</a></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="sec-head"><span class="sec-num">2</span><h2>Intervention</h2></div>
+        <div class="row">
+          <div class="field">
+            <label class="fl">Durée estimée de l'intervention</label>
+            <div class="suffix"><input type="number" id="duree" min="0" step="0.5" value="2"><span class="u">h</span></div>
+            <p class="hint">Minimum facturable : ½ journée (≈ 4 h), soit 140 € HT.</p>
+          </div>
+          <div class="field">
+            <label class="fl">Nuitées nécessaires (hébergement)</label>
+            <div class="suffix"><input type="number" id="nuitees" min="0" step="1" value="0"><span class="u">nuit(s)</span></div>
+            <p class="hint">Plafond 110 € / nuit (nuitée + panier repas).</p>
+          </div>
+        </div>
+      </div>
+
+
+    </div>
+
+    <!-- ===================== LEDGER ===================== -->
+    <div class="ledger">
+      <div class="card">
+        <div class="panel">
+          <div class="ledger-head"><h2>Ventilation du devis</h2><span class="cfg" id="cfgTag"></span></div>
+          <div id="lines" class="lines"></div>
+          <div class="grand">
+            <div class="row-grand">
+              <div class="col-grand">
+                <div class="k">Total HT sans marge</div>
+                <div class="v sm" id="grandHT">—<span class="cur">€</span></div>
+              </div>
+              <div class="col-grand" style="text-align:right">
+                <div class="k" id="margeLabel">Total HT + marge 10 %</div>
+                <div class="v" id="grandMarge">—<span class="cur">€</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="trace" id="trace"></div>
+        </div>
+      </div>
+      <footer class="note">
+        <b>Règles appliquées.</b>
+        IK calculées sur la distance totale (aller × 2) × 0,697 €/km (barème URSSAF, véhicule thermique 7 CV+).
+        Péage doublé (aller-retour). TJ = 280 €/jour, minimum facturable ½ journée = 140 €.
+        Hébergement plafonné à 110 €/nuit.
+        Distance calculée via <code>OSRM</code> (OpenStreetMap) — à valider contre Mappy / Waze.
+      </footer>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   BARÈME URSSAF IK 2025/2026 — Véhicules thermiques
+   (Arrêté 27 mars 2023, inchangé)
+   ============================================================ */
+const IK_COEFF = 0.697;   // Barème URSSAF 7 CV+ thermique, ≤ 5 000 km
+const MARGE_PCT = 10;     // Marge fixe 10 %
+const TJ = 280;           // Taux Journalier
+const TJ_MIN = 140;       // Minimum facturable (demi-journée)
+const NUIT = 110;          // Plafond hébergement / nuit
+
+/* ============================================================
+   HELPERS
+   ============================================================ */
+const eur = n => n.toLocaleString('fr-FR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+const $ = id => document.getElementById(id);
+
+/* ============================================================
+   STATE
+   ============================================================ */
+const state = {
+  origCoords: null,   // [lon, lat]
+  destCoords: null,
+  origLabel: '',
+  destLabel: '',
+  routeLoading: false
+};
+
+/* ============================================================
+   IK CALCULATION
+   ============================================================ */
+
+
+/* ============================================================
+   COMPUTE
+   ============================================================ */
+function compute() {
+  const distAller = Math.max(0, +$('distance').value || 0);
+  const peageAller = Math.max(0, +$('peage').value || 0);
+  const duree = Math.max(0, +$('duree').value || 0);
+  const nuitees = Math.max(0, Math.floor(+$('nuitees').value || 0));
+
+  const distTotale = +(distAller * 2).toFixed(1);
+  const peageTotal = +(peageAller * 2).toFixed(2);
+
+  // IK — (distance A/R) × 0,697
+  const ik = +(distTotale * IK_COEFF).toFixed(2);
+
+  // Temps homme
+  const tjBrut = duree * (TJ / 8); // convert hours to daily rate (8h = 1 day)
+  const tj = Math.max(tjBrut, TJ_MIN);
+  const tjMinApplied = tjBrut < TJ_MIN && duree > 0;
+
+  // Hébergement
+  const hebergement = nuitees * NUIT;
+
+  // Lines
+  const lines = [];
+  lines.push({
+    lbl: 'Indemnités kilométriques',
+    sub: eur(distTotale) + ' km (A/R) × ' + IK_COEFF.toFixed(3) + ' €/km',
+    amt: ik,
+    zero: ik === 0
+  });
+  lines.push({
+    lbl: 'Frais de péage',
+    sub: eur(peageAller) + ' € aller × 2',
+    amt: peageTotal,
+    zero: peageTotal === 0
+  });
+  lines.push({
+    lbl: 'Coût temps homme (TJ)',
+    sub: eur(duree) + ' h × ' + eur(TJ / 8) + ' €/h' + (tjMinApplied ? ' → min. 140 €' : ''),
+    amt: +tj.toFixed(2),
+    sig: tjMinApplied
+  });
+  lines.push({
+    lbl: 'Frais d\'hébergement',
+    sub: nuitees + ' nuit' + (nuitees > 1 ? 's' : '') + ' × ' + eur(NUIT) + ' €',
+    amt: hebergement,
+    zero: hebergement === 0
+  });
+
+  const totalHT = +(ik + peageTotal + tj + hebergement).toFixed(2);
+  const totalMarge = +(totalHT * (1 + MARGE_PCT / 100)).toFixed(2);
+
+  // Render lines
+  renderLines(lines, totalHT);
+
+  // Grand totals
+  $('grandHT').innerHTML = eur(totalHT) + '<span class="cur">€</span>';
+  $('grandHT').style.opacity = 0;
+  requestAnimationFrame(() => $('grandHT').style.opacity = 1);
+
+  $('margeLabel').textContent = 'Total HT + marge ' + MARGE_PCT + ' %';
+  $('grandMarge').innerHTML = eur(totalMarge) + '<span class="cur">€</span>';
+
+  // Config tag
+  $('cfgTag').textContent = eur(distAller) + ' km · ' + eur(duree) + ' h';
+
+  // Trace
+  buildTrace(distAller, distTotale, ik, tj, tjMinApplied);
+}
+
+function renderLines(lines, totalHT) {
+  const c = $('lines');
+  c.innerHTML = '';
+  lines.forEach(l => {
+    const d = document.createElement('div');
+    d.className = 'line' + (l.dim ? ' dim' : '') + (l.sig ? ' sig' : '') + (l.zero ? ' zero' : '');
+    d.innerHTML = '<span class="lbl">' + l.lbl + (l.sub ? '<small>' + l.sub + '</small>' : '') + '</span><span class="amt">' + eur(l.amt) + ' €</span>';
+    c.appendChild(d);
+  });
+  const st = document.createElement('div');
+  st.className = 'subtot';
+  st.innerHTML = '<span>Total HT sans marge</span><span class="amt">' + eur(totalHT) + ' €</span>';
+  c.appendChild(st);
+}
+
+function buildTrace(distAller, distTotale, ik, tj, tjMin) {
+  let h = '';
+  h += 'Distance aller : <b>' + eur(distAller) + ' km</b> → A/R : <b>' + eur(distTotale) + ' km</b><br>';
+  h += 'IK : ' + eur(distTotale) + ' × ' + IK_COEFF.toFixed(3) + ' = <b>' + eur(ik) + ' €</b><br>';
+  if (tjMin) h += '<span class="warn">Minimum ½ journée appliqué</span> : TJ brut < 140 € → <b>140,00 €</b><br>';
+  h += 'Barème : véhicule thermique, <b>7 CV+</b><br>';
+  $('trace').innerHTML = h;
+}
+
+/* ============================================================
+   GEOCODING — api-adresse.data.gouv.fr (BAN)
+   ============================================================ */
+let addrTimeout = {};
+
+function setupAddrInput(inputId, dropId, clearId, coordsKey, labelKey) {
+  const inp = $(inputId), drop = $(dropId), clr = $(clearId);
+  let hlIdx = -1;
+
+  inp.addEventListener('input', () => {
+    clr.style.display = inp.value ? '' : 'none';
+    clearTimeout(addrTimeout[inputId]);
+    if (inp.value.length < 3) { drop.classList.remove('open'); return; }
+    addrTimeout[inputId] = setTimeout(() => geocode(inp.value, drop, inputId), 280);
+  });
+
+  inp.addEventListener('blur', () => setTimeout(() => drop.classList.remove('open'), 180));
+  inp.addEventListener('focus', () => { if (drop.children.length > 0 && inp.value.length >= 3) drop.classList.add('open'); });
+
+  inp.addEventListener('keydown', e => {
+    const opts = drop.querySelectorAll('.opt');
+    if (e.key === 'ArrowDown') { e.preventDefault(); hlIdx = Math.min(hlIdx + 1, opts.length - 1); hlOpts(opts, hlIdx); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); hlIdx = Math.max(hlIdx - 1, 0); hlOpts(opts, hlIdx); }
+    else if (e.key === 'Enter' && hlIdx >= 0) { e.preventDefault(); opts[hlIdx]?.dispatchEvent(new Event('mousedown')); }
+    else if (e.key === 'Escape') { drop.classList.remove('open'); }
+  });
+
+  clr.addEventListener('click', () => {
+    inp.value = ''; clr.style.display = 'none';
+    state[coordsKey] = null; state[labelKey] = '';
+    drop.innerHTML = ''; drop.classList.remove('open');
+    $('routeResult').innerHTML = '';
+    compute();
+  });
+
+  function selectResult(feat) {
+    const coords = feat.geometry.coordinates; // [lon, lat]
+    state[coordsKey] = coords;
+    state[labelKey] = feat.properties.label;
+    inp.value = feat.properties.label;
+    clr.style.display = '';
+    drop.classList.remove('open');
+    hlIdx = -1;
+    tryRoute();
+  }
+
+  function geocode(q, dropEl, iid) {
+    fetch('https://api-adresse.data.gouv.fr/search/?q=' + encodeURIComponent(q) + '&limit=6')
+      .then(r => r.json())
+      .then(data => {
+        dropEl.innerHTML = ''; hlIdx = -1;
+        if (!data.features || data.features.length === 0) {
+          dropEl.innerHTML = '<div class="empty-msg">Aucune adresse trouvée</div>';
+          dropEl.classList.add('open'); return;
+        }
+        data.features.forEach(f => {
+          const d = document.createElement('div');
+          d.className = 'opt';
+          d.innerHTML = '<span>' + f.properties.name + '</span><small>' + (f.properties.context || f.properties.city || '') + '</small>';
+          d.addEventListener('mousedown', e => { e.preventDefault(); selectResult(f); });
+          dropEl.appendChild(d);
+        });
+        dropEl.classList.add('open');
+      })
+      .catch(() => {});
+  }
+}
+
+function hlOpts(opts, idx) { opts.forEach((o, i) => o.classList.toggle('hl', i === idx)); if (opts[idx]) opts[idx].scrollIntoView({ block: 'nearest' }); }
+
+/* ============================================================
+   ROUTING — OSRM (OpenStreetMap)
+   ============================================================ */
+function tryRoute() {
+  if (!state.origCoords || !state.destCoords) return;
+  const box = $('routeResult');
+  box.innerHTML = '<span class="spinner"></span> Calcul de l\'itinéraire…';
+  state.routeLoading = true;
+
+  const [oLon, oLat] = state.origCoords;
+  const [dLon, dLat] = state.destCoords;
+  const url = 'https://router.project-osrm.org/route/v1/driving/' + oLon + ',' + oLat + ';' + dLon + ',' + dLat + '?overview=false';
+
+  fetch(url)
+    .then(r => r.json())
+    .then(data => {
+      state.routeLoading = false;
+      if (data.code !== 'Ok' || !data.routes || data.routes.length === 0) {
+        box.innerHTML = '<div class="route-err">Itinéraire introuvable</div>';
+        return;
+      }
+      const route = data.routes[0];
+      const distKm = +(route.distance / 1000).toFixed(1);
+      const durMin = Math.round(route.duration / 60);
+      const durH = Math.floor(durMin / 60);
+      const durM = durMin % 60;
+      const durLabel = durH > 0 ? durH + ' h ' + (durM > 0 ? durM + ' min' : '') : durMin + ' min';
+
+      box.innerHTML = '<div class="route-badge"><span class="dot"></span>' +
+        state.origLabel + ' → ' + state.destLabel +
+        '<span class="sep">|</span>' + eur(distKm) + ' km aller' +
+        '<span class="sep">|</span>≈ ' + durLabel +
+        '</div>';
+
+      // Set distance field
+      $('distance').value = distKm;
+      updateMappyLink();
+      compute();
+    })
+    .catch(() => {
+      state.routeLoading = false;
+      box.innerHTML = '<div class="route-err">Erreur de calcul — saisissez la distance manuellement</div>';
+    });
+}
+
+/* ============================================================
+   MAPPY LINK
+   ============================================================ */
+function updateMappyLink() {
+  const link = $('mappyLink');
+  const orig = $('addrOrig').value || '';
+  const dest = $('addrDest').value || '';
+  if (orig && dest) {
+    link.href = 'https://www.mappy.com/itineraire?from=' + encodeURIComponent(orig) + '&to=' + encodeURIComponent(dest) + '&opt.vehicle=midcar&routeType=fastest';
+  } else {
+    link.href = 'https://www.mappy.com/itineraire';
+  }
+}
+
+/* ============================================================
+   EVENT BINDINGS
+   ============================================================ */
+setupAddrInput('addrOrig', 'dropOrig', 'clearOrig', 'origCoords', 'origLabel');
+setupAddrInput('addrDest', 'dropDest', 'clearDest', 'destCoords', 'destLabel');
+
+['distance', 'peage', 'duree', 'nuitees'].forEach(id => {
+  $(id).addEventListener('input', compute);
+  $(id).addEventListener('change', compute);
+});
+
+$('distance').addEventListener('input', updateMappyLink);
+$('addrOrig').addEventListener('change', updateMappyLink);
+$('addrDest').addEventListener('change', updateMappyLink);
+
+// Init
+updateMappyLink();
+compute();
+</script>
+</body>
+</html>
